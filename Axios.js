@@ -2,16 +2,6 @@
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
 
-/**
- * 4. Change all of your fetch() functions to axios!
- * - axios has already been imported for you within index.js.
- * - If you've done everything correctly up to this point, this should be simple.
- * - If it is not simple, take a moment to re-evaluate your original code.
- * - Hint: Axios has the ability to set default headers. Use this to your advantage
- *   by setting a default header with your API key so that you do not have to
- *   send it manually with all of your requests! You can also set a default base URL!
- */
-
 import * as Carousel from "./Carousel.js";
 import axios from "axios";
 
@@ -24,6 +14,9 @@ const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
+/**
+ * 4. Change all of your fetch() functions to axios!
+ */
 // Store your API key for easy access
 axios.defaults.baseURL = "https://api.thecatapi.com/v1/";
 axios.defaults.headers.common["x-api-key"] =
@@ -66,25 +59,36 @@ export async function loadBreedImagesAxios(breedId) {
     const carousel = document.getElementById("carouselInner");
     carousel.innerHTML = ""; // Clear previous images
 
-    images.forEach((image) => {
-      const template = document.getElementById("carouselItemTemplate");
-      const clone = template.content.cloneNode(true);
-      const imgElement = clone.querySelector("img");
+    // If there are no images, show a message, this is from part 10
+    if (images.length === 0) {
+      const noImagesMessage = document.createElement("div");
+      noImagesMessage.textContent = "No images available for this breed.";
+      carousel.appendChild(noImagesMessage);
+    } else {
+      images.forEach((image) => {
+        const template = document.getElementById("carouselItemTemplate");
+        const clone = template.content.cloneNode(true);
+        const imgElement = clone.querySelector("img");
 
-      imgElement.src = image.url;
-      imgElement.alt = "Cat image"; // Add alt text for accessibility
+        imgElement.src = image.url;
+        imgElement.alt = "Cat image";
 
-      // Get the heart icon element in the cloned template
-      const heartIcon = clone.querySelector(".favourite-button");
-      heartIcon.setAttribute("data-img-id", image.id); // Set the image ID as a data attribute
+        // Get the heart icon element in the cloned template
+        const heartIcon = clone.querySelector(".favourite-button");
+        heartIcon.setAttribute("data-img-id", image.id); // Set the image ID as a data attribute
 
-      // Attach the event listener to the heart icon
-      heartIcon.addEventListener("click", () => favourite(heartIcon)); // Call the favourite function when clicked
+        // Attach the event listener to the heart icon
+        heartIcon.addEventListener("click", function () {
+          favourite(heartIcon); // Call the favourite function when clicked on the heart
+          // i have some trouble here that i couldnt fix unfortunatly
+        });
 
-      // Append the carousel item to the carousel
-      carousel.appendChild(clone);
-    });
+        // Append the carousel item to the carousel
+        carousel.appendChild(clone);
+      });
+    }
 
+    // Check if breed description is available, otherwise show a fallback message
     const breedDescription =
       images[0]?.breeds?.[0]?.description || "No description available.";
     infoDump.innerHTML = `Breed Info: ${breedDescription}`;
@@ -103,7 +107,13 @@ export function setupBreedSelection() {
 setupBreedSelection();
 
 /**
- * Add axios interceptors to log the time between request and response to the console.
+ * 5- Add axios interceptors to log the time between request and response to the console.
+ */
+
+/**
+ * 7. As a final element of progress indication, add the following to your axios interceptors:
+ * - In your request interceptor, set the body element's cursor style to "progress."
+ * - In your response interceptor, remove the progress cursor style from the body element.
  */
 axios.interceptors.request.use((config) => {
   config.metadata = { startTime: Date.now() }; // Store the start time
@@ -129,10 +139,11 @@ axios.interceptors.response.use(
 );
 
 /**
- * 7. As a final element of progress indication, add the following to your axios interceptors:
- * - In your request interceptor, set the body element's cursor style to "progress."
- * - In your response interceptor, remove the progress cursor style from the body element.
+ * 6 . Create a progress bar to indicate the request is in progress.:
+ * - You need only to modify its width style property to align with the request progress.
+ * - in your request interceptor, set the width of the progressBar element to 0%.
  */
+
 function updateProgress(event) {
   console.log("ProgressEvent:", event); // Log the entire ProgressEvent object
 
@@ -159,6 +170,7 @@ function updateProgress(event) {
  */
 
 export async function favourite(heartIcon) {
+  console.log("favourite() called", heartIcon);
   const imageId = heartIcon.getAttribute("data-img-id"); // Get the image ID from the heart icon's data attribute
 
   try {
@@ -258,3 +270,9 @@ export async function getFavourites() {
 getFavouritesBtn.addEventListener("click", async () => {
   await getFavourites(); // Fetch and display favourites when button is clicked
 });
+/**
+ * 10. Test your site, thoroughly!
+ *  - If this is working, good job! If not, look for the reason why and fix it!
+ * - Test other breeds as well. Not every breed has the same data available, so
+ *   your code should account for this.
+ */
