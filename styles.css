@@ -77,3 +77,20 @@ body {
     height: 17em;
   }
 }
+
+heart-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 2rem;
+  transition: color 0.3s;
+}
+
+.heart-icon.favourited {
+  color: red;
+}
+
+.heart-icon.unfavourited {
+  color: gray;
+}
